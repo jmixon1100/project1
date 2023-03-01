@@ -26,28 +26,30 @@ public class MyBlockingQueue<E> {
     }
 
     public synchronized void add(E p) {
-        if (a.size() == this.size){
+        while (a.size() == this.size) {
             try {
                 wait();
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
-        s1.p(); 
+        s1.p();
         a.add(p);
         notify();
         s1.v();
     }
 
     public synchronized E remove() {
-        if(a.isEmpty()){
+        while (a.isEmpty()) {
             try {
                 wait();
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
         s2.p();
         E val = a.remove(0);
         notify();
         s2.v();
-        
+
         return val;
 
     }
