@@ -9,8 +9,8 @@ public class MyBlockingQueue<E> {
     public MyBlockingQueue(int size) {
         this.size = size;
         this.a = new ArrayList<>(size);
-        this.s1 = new MySemaphore(size-1);
-        this.s2 = new MySemaphore(size-1);
+        this.s1 = new MySemaphore(size);
+        this.s2 = new MySemaphore(size);
     }
 
     public int getNumElements() {
@@ -22,19 +22,32 @@ public class MyBlockingQueue<E> {
     }
 
     public boolean isEmpty() {
-        return a.size() == 0;
+        return a.isEmpty();
     }
 
-    public void add(E p) {
+    public synchronized void add(E p) {
+        if (a.size() == this.size){
+            try {
+                wait();
+            } catch (Exception e) {}
+        }
         s1.p(); 
         a.add(p);
+        notify();
         s1.v();
     }
 
-    public E remove() {
+    public synchronized E remove() {
+        if(a.isEmpty()){
+            try {
+                wait();
+            } catch (Exception e) {}
+        }
         s2.p();
         E val = a.remove(0);
+        notify();
         s2.v();
+        
         return val;
 
     }
